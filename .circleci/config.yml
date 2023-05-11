@@ -33,7 +33,7 @@ jobs:
             . venv/bin/activate
             make lint
   upload-docker:
-    description: Upload to docker hub
+    description: Upload to Dockerhub
     parameters:
       image_name:
         default: "devops-capstone"
@@ -53,8 +53,7 @@ jobs:
           command: |
             docker build --tag=<<parameters.image_name>> .
             docker image ls
-
-      -DOCKER_IMAGE_NAME run:
+      -run:
           name: Upload Docker to Dockerhub
           command: |
             echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
