@@ -52,15 +52,15 @@ jobs:
       - run:
           name: Build docker container
           command: |
-            docker build --tag="<<parameters.image_name>>" .
+            docker build --tag=<< pipeline.parameters.image_name >> .
             docker image ls
       -run:
           name: Upload Docker to Dockerhub
           command: |
-            echo "Docker ID and Image: <<parameters.image_name>>"
+            echo "Docker ID and Image: << pipeline.parameters.image_name >>"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag <<parameters.image_name>> $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
-            docker push $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
+            docker tag << pipeline.parameters.image_name >> $DOCKERHUB_USERNAME/<< pipeline.parameters.image_name >>:<< pipeline.parameters.workflow_id >>
+            docker push $DOCKERHUB_USERNAME/<< pipeline.parameters.image_name >>:<< pipeline.parameters.workflow_id >>
       
 workflows:
   default:
