@@ -3,8 +3,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "<h1 style='text-align: center;'>Welcome to my Cloud DevOps Engineer Capstone Project!</h1><br><h2>TamVN thank you Mr.Riviewer</h2>"
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=True) # specify port=80
+    app.run(host='0.0.0.0', port=5000, debug=True)
