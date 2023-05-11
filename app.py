@@ -1,11 +1,10 @@
-from flask import Flask, render_template
-import os
+from flask import Flask
 app = Flask(__name__)
 
 @app.route('/')
-def hello_udacity():
-    return render_template('index.html')
+def home():
+    return "<h1 style='text-align: center;'>Welcome to my Cloud DevOps Engineer Capstone Project!</h1><br><h2>TamVN thank you Mr.Riviewer</h2>"
+
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=80, debug=True) # specify port=80
