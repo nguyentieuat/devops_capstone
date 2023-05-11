@@ -32,6 +32,7 @@ jobs:
           command: |
             . venv/bin/activate
             make lint
+            
   upload-docker:
     description: Upload to Dockerhub
     parameters:
@@ -53,7 +54,7 @@ jobs:
           command: |
             docker build --tag=<<parameters.image_name>> .
             docker image ls
-            
+
       -run:
           name: Upload Docker to Dockerhub
           command: |
