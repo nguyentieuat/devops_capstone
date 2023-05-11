@@ -33,6 +33,14 @@ jobs:
             . venv/bin/activate
             make lint
   upload-docker:
+    description: Upload to docker hub
+    parameters:
+      image_name:
+        default: "devops-capstone"
+        type: string
+      workflow_id:
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
+        type: string
     docker:
       - image: circleci/golang:1.15
     working_directory: ~/repo
@@ -40,20 +48,19 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
-      # - run:
-      #     name: Build docker container
-      #     command: |
-      #       docker build --tag=$DOCKER_IMAGE_NAME .
-      #       docker image ls
-
       - run:
+          name: Build docker container
+          command: |
+            docker build --tag=<<parameters.image_name>> .
+            docker image ls
+
+      -DOCKER_IMAGE_NAME run:
           name: Upload Docker to Dockerhub
           command: |
-            # echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
-            # docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            # docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
-            # docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
-            echo "CircleCI Workflow ID: $CIRCLE_WORKFLOW_ID"
+            echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
+            docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+            docker tag <<parameters.image_name>> $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
+            docker push $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
       
 workflows:
   default:
