@@ -35,15 +35,8 @@ jobs:
 
   upload-docker:
     description: Upload to Dockerhub
-    parameters:
-      image_name:
-        default: "devops-capstone"
-        type: string
-      workflow_id:
-        default: "${CIRCLE_WORKFLOW_ID:0:7}"
-        type: string
     docker:
-      - image: circleci/golang:1.15
+      - image: docker:stable
     working_directory: ~/repo
     steps:
       - checkout
@@ -52,16 +45,16 @@ jobs:
       - run:
           name: Build docker container
           command: |
-            docker build --tag=<< pipeline.parameters.image_name >> .
+            docker build --tag=$DOCKER_IMAGE_NAME .
             docker image ls
-      -run:
+      - run:
           name: Upload Docker to Dockerhub
           command: |
-            echo "Docker ID and Image: << pipeline.parameters.image_name >>"
+            echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag << pipeline.parameters.image_name >> $DOCKERHUB_USERNAME/<< pipeline.parameters.image_name >>:<< pipeline.parameters.workflow_id >>
-            docker push $DOCKERHUB_USERNAME/<< pipeline.parameters.image_name >>:<< pipeline.parameters.workflow_id >>
-      
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+
 workflows:
   default:
     jobs:
