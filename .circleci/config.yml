@@ -57,7 +57,7 @@ jobs:
       -run:
           name: Upload Docker to Dockerhub
           command: |
-            echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
+            echo "Docker ID and Image: <<parameters.image_name>>"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
             docker tag <<parameters.image_name>> $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
             docker push $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
