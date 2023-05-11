@@ -8,6 +8,9 @@ install:
 	# This should be run from inside a virtualenv
 	pip install --upgrade pip &&\
 	pip install -r requirements.txt
+	#install hadolint
+    sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+	sudo chmod +x /bin/hadolint
 
 test:
 	# Additional, optional, tests could go here
@@ -17,7 +20,7 @@ test:
 lint:
 	# See local hadolint install instructions:   https://github.com/hadolint/hadolint
 	# This is linter for Dockerfiles
-	hadolint Dockerfile
+	./hadolint Dockerfile
 	# This is linter for html
 	tidy -q -e ../templates/index.html
 	# This is a linter for Python source code linter: https://www.pylint.org/
