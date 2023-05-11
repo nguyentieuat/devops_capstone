@@ -32,7 +32,7 @@ jobs:
           command: |
             . venv/bin/activate
             make lint
-            
+
   upload-docker:
     description: Upload to Dockerhub
     parameters:
@@ -55,13 +55,13 @@ jobs:
             docker build --tag=<<parameters.image_name>> .
             docker image ls
 
-      -run:
-          name: Upload Docker to Dockerhub
-          command: |
-            echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
-            docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag <<parameters.image_name>> $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
-            docker push $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
+      # -run:
+      #     name: Upload Docker to Dockerhub
+      #     command: |
+      #       echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
+      #       docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+      #       docker tag <<parameters.image_name>> $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
+      #       docker push $DOCKERHUB_USERNAME/<<parameters.image_name>>:<<parameters.workflow_id>>
       
 workflows:
   default:
