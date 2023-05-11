@@ -22,6 +22,12 @@ jobs:
             . venv/bin/activate
             make install
 
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            make test
       # run lint
       - run:
           name: run lint
