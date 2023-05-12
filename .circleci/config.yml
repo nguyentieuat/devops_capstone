@@ -65,33 +65,38 @@ jobs:
           name: Install dependencies
           command: yum install -y tar gzip
       
+      # - run:
+      #     name: Ensure EKS network exists
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file cloudformation/networks.yml \
+      #         --tags project=${ENVIRONMENT_NAME}-project \
+      #         --stack-name ${ENVIRONMENT_NAME}-eks-network \
+      #         --region us-east-1
+      # - run:
+      #     name: Ensure EKS Cluster exists
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file cloudformation/cluster.yml \
+      #         --tags project=${ENVIRONMENT_NAME}-project \
+      #         --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
+      #         --capabilities CAPABILITY_NAMED_IAM \
+      #         --region us-east-1
+      #     no_output_timeout: 15m
+      # - run:
+      #     name: Ensure Nodegroup exists
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file cloudformation/nodegroup.yml \
+      #         --tags project=${ENVIRONMENT_NAME}-project \
+      #         --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
+      #         --capabilities CAPABILITY_NAMED_IAM \
+      #         --region us-east-1
       - run:
-          name: Ensure EKS network exists
+          name: Show info instances
           command: |
-            aws cloudformation deploy \
-              --template-file cloudformation/networks.yml \
-              --tags project=${ENVIRONMENT_NAME}-project \
-              --stack-name ${ENVIRONMENT_NAME}-eks-network \
-              --region us-east-1
-      - run:
-          name: Ensure EKS Cluster exists
-          command: |
-            aws cloudformation deploy \
-              --template-file cloudformation/cluster.yml \
-              --tags project=${ENVIRONMENT_NAME}-project \
-              --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
-              --capabilities CAPABILITY_NAMED_IAM \
-              --region us-east-1
-          no_output_timeout: 15m
-      - run:
-          name: Ensure Nodegroup exists
-          command: |
-            aws cloudformation deploy \
-              --template-file cloudformation/nodegroup.yml \
-              --tags project=${ENVIRONMENT_NAME}-project \
-              --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
-              --capabilities CAPABILITY_NAMED_IAM \
-              --region us-east-1
+            aws ec2 create-default-subnet
+            aws ec2 describe-instances
       - run:
           name: Ensure management instances exists
           command: |
@@ -106,9 +111,10 @@ jobs:
           name: Extract the IPs of the management instances for Ansible
           command: |
             echo [management] > ~/inventory.txt
-            aws --region us-east-1 ec2 describe-instances \
+            aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
+              --region us-east-1 \
               --output text >> ~/inventory.txt
             cat ~/inventory.txt
       - persist_to_workspace:
