@@ -1,5 +1,5 @@
 Description: >
-  Create network for prj
+  Creates an Amazon EKS Network
 
 Parameters:
   EnvironmentName:

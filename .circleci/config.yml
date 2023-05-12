@@ -117,14 +117,14 @@ jobs:
             - inventory.txt
             - checkIfDeployed.txt
 
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            echo "Destroying environment: deploy-infrastructure "
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
+      # - run:
+      #     name: Destroy environments
+      #     when: on_fail
+      #     command: |
+      #       echo "Destroying environment: deploy-infrastructure "
+      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
+      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
+      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
 
 workflows:
   default:
