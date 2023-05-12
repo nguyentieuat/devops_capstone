@@ -92,16 +92,7 @@ jobs:
       #         --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
       #         --capabilities CAPABILITY_NAMED_IAM \
       #         --region us-east-1
-      - run:
-          name: Show info instances
-          command: |
-            aws ec2 create-default-subnet --availability-zone us-east-1a
-            aws ec2 create-default-subnet --availability-zone us-east-1b
-            aws ec2 create-default-subnet --availability-zone us-east-1c
-            aws ec2 create-default-subnet --availability-zone us-east-1d
-            aws ec2 create-default-subnet --availability-zone us-east-1e
-            aws ec2 create-default-subnet --availability-zone us-east-1f
-
+      
       - run:
           name: Ensure management instances exists
           command: |
