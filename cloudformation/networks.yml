@@ -5,7 +5,7 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
-    Default: Luannt19-UdacityProject
+    Default: Luannt19-Uda
 
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC
@@ -32,6 +32,19 @@ Parameters:
     Type: String
     Default: 10.0.3.0/24
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Worker Network Configuration"
+        Parameters:
+          - VpcBlock
+          - PublicSubnet1CIDR
+          - PublicSubnet2CIDR
+          - PrivateSubnet1CIDR
+          - PrivateSubnet2CIDR
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -40,14 +53,14 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Ref EnvironmentName
+          Value: !Sub ${EnvironmentName}-VPC
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref EnvironmentName
+          Value: !Sub ${EnvironmentName}-VPC
 
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -198,7 +211,7 @@ Outputs:
     Description: A reference to the created VPC
     Value: !Ref VPC
     Export:
-      Name: !Sub ${EnvironmentName}-VPCID
+      Name: !Sub ${EnvironmentName}-VPC
 
   VPCPublicRouteTable:
     Description: Public Routing
