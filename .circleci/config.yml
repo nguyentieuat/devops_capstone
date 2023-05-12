@@ -165,3 +165,4 @@ workflows:
           requires:
             - test-build
       - deploy-infrastructure
+      - configure-infrastructure
