@@ -146,7 +146,9 @@ jobs:
       - run:
           name: Configure server
           command: |
+            echo "inventory"
             cat ~/inventory.txt
+            echo "checkDeployed"
             cat ~/checkDeployed.txt
             # if grep -q "No changes to deploy" ~/checkDeployed.txt
             #   then
