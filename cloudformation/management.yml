@@ -42,9 +42,9 @@ Resources:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
           GroupSet: 
-            - Ref: ${EnvironmentName}-SCG
+            - Ref: !Sub ${EnvironmentName}-SCG
           SubnetId: 
-            Ref: ${EnvironmentName}-PUB2-SN
+            Ref: !Sub ${EnvironmentName}-PUB2-SN
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management1
@@ -63,9 +63,9 @@ Resources:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
           GroupSet: 
-            - Ref: ${EnvironmentName}-SCG
+            - Ref: !Sub ${EnvironmentName}-SCG
           SubnetId: 
-            Ref: ${EnvironmentName}-PUB2-SN
+            Ref: !Sub ${EnvironmentName}-PUB2-SN
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management2
