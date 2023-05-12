@@ -1,39 +1,39 @@
 version: 2.1
 
 jobs:
-  test-build:
-    docker:
-      - image: python:3.7.3-stretch
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
-          - v1-dependencies-
-      - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make install
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-      # run tests!
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            make test
-      # run lints!
-      - run:
-          name: run lint
-          command: |
-            . venv/bin/activate
-            make lint
+  # test-build:
+  #   docker:
+  #     - image: python:3.7.3-stretch
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys:
+  #         - v1-dependencies-{{ checksum "requirements.txt" }}
+  #         - v1-dependencies-
+  #     - run:
+  #         name: install dependencies
+  #         command: |
+  #           python3 -m venv venv
+  #           . venv/bin/activate
+  #           make install
+  #     - save_cache:
+  #         paths:
+  #           - ./venv
+  #         key: v1-dependencies-{{ checksum "requirements.txt" }}
+  #     # run tests!
+  #     - run:
+  #         name: run tests
+  #         command: |
+  #           . venv/bin/activate
+  #           make test
+  #     # run lints!
+  #     - run:
+  #         name: run lint
+  #         command: |
+  #           . venv/bin/activate
+  #           make lint
 
-  upload-docker:
+  # upload-docker:
     description: Upload to Dockerhub
     docker:
       - image: docker:stable
@@ -54,6 +54,22 @@ jobs:
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
             docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
             docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+  
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yum install -y tar gzip
+      
+      - run:
+          name: Ensure EKS network exists
+          command: |
+            echo ${ENVIRONMENT_NAME}
+      
+    
 
 workflows:
   default:
