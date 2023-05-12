@@ -1,59 +1,59 @@
 version: 2.1
 
 jobs:
-  # test-build:
-  #   docker:
-  #     - image: python:3.7.3-stretch
-  #   steps:
-  #     - checkout
-  #     - restore_cache:
-  #         keys:
-  #         - v1-dependencies-{{ checksum "requirements.txt" }}
-  #         - v1-dependencies-
-  #     - run:
-  #         name: install dependencies
-  #         command: |
-  #           python3 -m venv venv
-  #           . venv/bin/activate
-  #           make install
-  #     - save_cache:
-  #         paths:
-  #           - ./venv
-  #         key: v1-dependencies-{{ checksum "requirements.txt" }}
-  #     # run tests!
-  #     - run:
-  #         name: run tests
-  #         command: |
-  #           . venv/bin/activate
-  #           make test
-  #     # run lints!
-  #     - run:
-  #         name: run lint
-  #         command: |
-  #           . venv/bin/activate
-  #           make lint
+  test-build:
+    docker:
+      - image: python:3.7.3-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            make install
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            make test
+      # run lints!
+      - run:
+          name: run lint
+          command: |
+            . venv/bin/activate
+            make lint
 
-  # upload-docker:
-  #   description: Upload to Dockerhub
-  #   docker:
-  #     - image: docker:stable
-  #   working_directory: ~/repo
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker:
-  #         version: 20.10.14
-  #     - run:
-  #         name: Build docker container
-  #         command: |
-  #           docker build --tag=$DOCKER_IMAGE_NAME .
-  #           docker image ls
-  #     - run:
-  #         name: Upload Docker to Dockerhub
-  #         command: |
-  #           echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
-  #           docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-  #           docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
-  #           docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+  upload-docker:
+    description: Upload to Dockerhub
+    docker:
+      - image: docker:stable
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+      - run:
+          name: Build docker container
+          command: |
+            docker build --tag=$DOCKER_IMAGE_NAME .
+            docker image ls
+      - run:
+          name: Upload Docker to Dockerhub
+          command: |
+            echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
+            docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
   
   deploy-infrastructure:
     description: Deploy Infrastructure EKS
@@ -65,33 +65,33 @@ jobs:
           name: Install dependencies
           command: yum install -y tar gzip
       
-      # - run:
-      #     name: Ensure EKS network exists
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file cloudformation/networks.yml \
-      #         --tags project=${ENVIRONMENT_NAME}-project \
-      #         --stack-name ${ENVIRONMENT_NAME}-eks-network \
-      #         --region us-east-1
-      # - run:
-      #     name: Ensure EKS Cluster exists
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file cloudformation/cluster.yml \
-      #         --tags project=${ENVIRONMENT_NAME}-project \
-      #         --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
-      #         --capabilities CAPABILITY_NAMED_IAM \
-      #         --region us-east-1
-      #     no_output_timeout: 15m
-      # - run:
-      #     name: Ensure Nodegroup exists
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file cloudformation/nodegroup.yml \
-      #         --tags project=${ENVIRONMENT_NAME}-project \
-      #         --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
-      #         --capabilities CAPABILITY_NAMED_IAM \
-      #         --region us-east-1
+      - run:
+          name: Ensure EKS network exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/networks.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name ${ENVIRONMENT_NAME}-eks-network \
+              --region ${AWS_DEFAULT_REGION}
+      - run:
+          name: Ensure EKS Cluster exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/cluster.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
+              --capabilities CAPABILITY_NAMED_IAM \
+              --region ${AWS_DEFAULT_REGION}
+          no_output_timeout: 15m
+      - run:
+          name: Ensure Nodegroup exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/nodegroup.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
+              --capabilities CAPABILITY_NAMED_IAM \
+              --region ${AWS_DEFAULT_REGION}
       
       - run:
           name: Ensure management instances exists
@@ -100,7 +100,7 @@ jobs:
               --template-file cloudformation/management.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
               --stack-name "${ENVIRONMENT_NAME}-eks-management" \
-              --region us-east-1 \
+              --region ${AWS_DEFAULT_REGION} \
               --output text >> ~/checkDeployed.txt
             cat ~/checkDeployed.txt
       - run:
@@ -110,29 +110,58 @@ jobs:
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
-              --region us-east-1 \
+              --region ${AWS_DEFAULT_REGION} \
               --output text >> ~/inventory.txt
             cat ~/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
             - inventory.txt
-            - checkIfDeployed.txt
+            - checkDeployed.txt
 
-      # - run:
-      #     name: Destroy environments
-      #     when: on_fail
-      #     command: |
-      #       echo "Destroying environment: deploy-infrastructure "
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
-
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment: deploy-infrastructure "
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
+  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "ae:e0:e9:2f:57:51:a2:82:ff:06:bc:9b:65:37:2a:4c"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            cat ~/inventory.txt
+            cat ~/checkDeployed.txt
+            # if grep -q "No changes to deploy" ~/checkDeployed.txt
+            #   then
+            #     cat ~/inventory.txt
+            #     echo "Our management instances are already configured."
+            #   else
+            #     cat ~/inventory.txt
+            #     cd ansible
+            #     ansible-playbook -i ~/inventory.txt configure-server.yml
+            #   fi
 workflows:
   default:
     jobs:
-      # - test-build
-      # - upload-docker:
-      #     requires:
-      #       - test-build
+      - test-build
+      - upload-docker:
+          requires:
+            - test-build
       - deploy-infrastructure
