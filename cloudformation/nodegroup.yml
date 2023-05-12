@@ -1,31 +1,30 @@
 Description: >
-  TamVN / Capstone Project
   Creates the nodegroup for the Amazon EKS Cluster
 Parameters:
-  EnvironmentName:
-    Description: An Environment name that will be prefixed to resources
-    Default: tamvn-capstone
+    EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
     Type: String
+    Default: Luannt19-Uda
 
   MinSize:
-    Description: Minimum number of web application servers
+    Description: Minimum number of web application server
+    Type: Number
     Default: 2
-    Type: String
 
   MaxSize:
     Description: Maximum number of web application servers
+    Type: Number
     Default: 6
-    Type: String
 
   DesiredSize:
-    Description: How many instances should be created.
-    Default: 4
+    Description: Num instances should be created.
     Type: Number
+    Default: 4
 
   KeyPairName:
     Description: The EC2 Key Pair to allow SSH access to the instances
-    Default: udacity
     Type: AWS::EC2::KeyPair::KeyName
+    Default: udacapstone
 
 Mappings:
   ServicePrincipals:
