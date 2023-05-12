@@ -68,7 +68,7 @@ jobs:
       - run:
           name: Ensure EKS network exists
           command: |
-            aws ec2 create-default-subnet --availability-zone us-east-1c
+            aws ec2 create-default-subnet --availability-zone us-east-1d
             # aws cloudformation deploy \
             #   --template-file cloudformation/networks.yml \
             #   --tags project=${ENVIRONMENT_NAME}-project \
