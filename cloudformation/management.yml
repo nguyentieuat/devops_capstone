@@ -38,6 +38,7 @@ Resources:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
       ImageId: !Ref amiImageId
+      SubnetId: !Ref !Sub ${EnvironmentName}-PUB1-SN
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management1
@@ -52,6 +53,7 @@ Resources:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
       ImageId: !Ref amiImageId
+      SubnetId: !Ref !Sub ${EnvironmentName}-PUB2-SN
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management2

@@ -92,10 +92,7 @@ jobs:
       #         --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
       #         --capabilities CAPABILITY_NAMED_IAM \
       #         --region us-east-1
-      - run:
-          name: Show info instances
-          command: |
-            aws ec2 describe-instances
+      
       - run:
           name: Ensure management instances exists
           command: |
