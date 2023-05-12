@@ -70,8 +70,7 @@ jobs:
             aws cloudformation deploy \
               --template-file cloudformation/networks.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
-              --stack-name "${ENVIRONMENT_NAME}-eks-network" \
-              --parameter-overrides file://cloudformation/networks-parameters.json
+              --stack-name=${ENVIRONMENT_NAME}-eks-network \
               --region us-east-1
 
 workflows:
