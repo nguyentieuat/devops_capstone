@@ -95,7 +95,7 @@ jobs:
       - run:
           name: Show info instances
           command: |
-            aws ec2 create-default-subnet
+            aws ec2 create-default-subnet --availability-zone us-east-1
             aws ec2 describe-instances
       - run:
           name: Ensure management instances exists
