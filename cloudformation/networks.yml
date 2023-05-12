@@ -82,28 +82,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select [0, !GetAZs ""]
-      CidrBlock: !Ref PublicSubnet1CIDR
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
-
-  PublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select [1, !GetAZs ""]
-      CidrBlock: !Ref PublicSubnet2CIDR
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
-
   NatGateway1EIP:
     Type: AWS::EC2::EIP
     DependsOn: InternetGatewayAttachment
@@ -116,7 +94,18 @@ Resources:
     Properties:
       Domain: vpc
 
-  NatGateway1:
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+ NatGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NatGateway1EIP.AllocationId
@@ -127,6 +116,17 @@ Resources:
     Properties:
       AllocationId: !GetAtt NatGateway2EIP.AllocationId
       SubnetId: !Ref PublicSubnet2
+      
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
 
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -228,35 +228,11 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PUB-RT
 
-  # VPCPrivateRouteTable1:
-  #   Description: Private Routing AZ1
-  #   Value: !Ref PrivateRouteTable1
-  #   Export:
-  #     Name: !Sub ${EnvironmentName}-PRI1-RT
-
-  # VPCPrivateRouteTable2:
-  #   Description: Private Routing AZ2
-  #   Value: !Ref PrivateRouteTable2
-  #   Export:
-  #     Name: !Sub ${EnvironmentName}-PRI2-RT
-
-  PublicSubnets:
-    Description: A list of the public subnets
-    Value: !Join [",", [!Ref PublicSubnet1, !Ref PublicSubnet2]]
-    Export:
-      Name: !Sub ${EnvironmentName}-PUB-NETS
-
   SecurityGroup:
     Description: Security group for the cluster control plane communication with worker nodes
     Value: !Ref ControlPlaneSecurityGroup
     Export:
       Name: !Sub ${EnvironmentName}-SCG
-
-  # PrivateSubnets:
-  #   Description: A list of the private subnets
-  #   Value: !Join [",", [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
-  #   Export:
-  #     Name: !Sub ${EnvironmentName}-PRIV-NETS
 
   PublicSubnet1:
     Description: A reference to the public subnet in the 1st Availability Zone
@@ -270,6 +246,25 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-PUB2-SN
 
+  PublicSubnets:
+    Description: A list of the public subnets
+    Value: !Join [",", [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB-NETS
+
+  # VPCPrivateRouteTable1:
+  #   Description: Private Routing AZ1
+  #   Value: !Ref PrivateRouteTable1
+  #   Export:
+  #     Name: !Sub ${EnvironmentName}-PRI1-RT
+
+  # VPCPrivateRouteTable2:
+  #   Description: Private Routing AZ2
+  #   Value: !Ref PrivateRouteTable2
+  #   Export:
+  #     Name: !Sub ${EnvironmentName}-PRI2-RT
+
+
   # PrivateSubnet1:
   #   Description: A reference to the private subnet in the 1st Availability Zone
   #   Value: !Ref PrivateSubnet1
@@ -281,3 +276,9 @@ Outputs:
   #   Value: !Ref PrivateSubnet2
   #   Export:
   #     Name: !Sub ${EnvironmentName}-PRI2-SN
+
+  # PrivateSubnets:
+  #   Description: A list of the private subnets
+  #   Value: !Join [",", [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
+  #   Export:
+  #     Name: !Sub ${EnvironmentName}-PRIV-NETS
