@@ -164,5 +164,13 @@ workflows:
       - upload-docker:
           requires:
             - test-build
-      - deploy-infrastructure
-      - configure-infrastructure
+          filters:
+            branches:
+              only: [ master ]
+      - deploy-infrastructure:
+          filters:
+            branches:
+              only: [ master ]
+      - configure-infrastructure:
+          requires:
+            - deploy-infrastructure
