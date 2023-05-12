@@ -56,6 +56,7 @@ jobs:
   #           docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
   
   deploy-infrastructure:
+    description: Deploy Infrastructure EKS
     docker:
       - image: amazon/aws-cli
     steps:
@@ -123,7 +124,7 @@ jobs:
                 name: Destroy environments
                 when: on_fail
                 command: |
-                  echo "Destroying environment: << parameters.workflow_id >> "
+                  echo "Destroying environment: deploy-infrastructure "
                   aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
                   aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
                   aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
