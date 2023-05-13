@@ -1,19 +1,8 @@
 ---
 - name: "Download kubectl"
-  # shell: |
-  #   curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl
-  get_url:
-    url: https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl
-  args:
-    chdir: $HOME
-
-- name: "Apply execute permissions to the binary"
-  shell: chmod +x ./kubectl
-  args:
-    chdir: $HOME
-
-- name: "Copy the binary to a folder to the $PATH"
-  shell: mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+  shell: |
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   args:
     chdir: $HOME
 
