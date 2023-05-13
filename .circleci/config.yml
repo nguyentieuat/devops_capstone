@@ -119,16 +119,6 @@ jobs:
             - inventory.txt
             - checkDeployed.txt
 
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            echo "Destroying environment: deploy-infrastructure "
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
-            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
-  
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11
@@ -146,10 +136,6 @@ jobs:
       - run:
           name: Configure server
           command: |
-            echo "inventory"
-            cat ~/inventory.txt
-            echo "checkDeployed"
-            cat ~/checkDeployed.txt
             if grep -q "No changes to deploy" ~/checkDeployed.txt
               then
                 cat ~/inventory.txt
