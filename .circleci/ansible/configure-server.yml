@@ -27,7 +27,9 @@
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
   tasks:
     - name: Set the aws_access_key_id
-      shell: "aws configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }}"
+      shell: |
+        echo "AWS_ACCESS_KEY_ID {{ AWS_ACCESS_KEY_ID }}"
+        "aws configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }}"
     - name: Set the aws_secret_access_key
       shell: "aws configure set aws_secret_access_key {{ AWS_SECRET_ACCESS_KEY }}"
     - name: Set the aws_session_token
