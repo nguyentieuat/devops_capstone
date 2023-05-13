@@ -72,13 +72,13 @@
 
   tasks:
     - name: Set the aws_access_key_id
-      shell: "aws --profile default configure set aws_access_key_id $AWS_ACCESS_KEY_ID "
+      shell: "aws --profile default configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }} "
     - name: Set the aws_secret_access_key
-      shell: "aws --profile default configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY "
+      shell: "aws --profile default configure set aws_secret_access_key {{ AWS_SECRET_ACCESS_KEY }} "
     - name: Set the aws_session_token
-      shell: "aws --profile default configure set aws_session_token $AWS_SESSION_TOKEN "
+      shell: "aws --profile default configure set aws_session_token {{ AWS_SESSION_TOKEN }} "
     - name: Set the default.region
-      shell: "aws --profile default configure set region $AWS_DEFAULT_REGION"
+      shell: "aws --profile default configure set region {{ AWS_DEFAULT_REGION }}"
 
 - name: "Fetch kubectl config"
   hosts: management
