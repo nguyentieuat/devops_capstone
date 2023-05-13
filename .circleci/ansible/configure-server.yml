@@ -26,25 +26,30 @@
     AWS_SESSION_TOKEN: "{{ lookup('env','AWS_SESSION_TOKEN') }}"
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
   tasks:
-    - name: Set the aws_access_key_id
+    - name: Show environment variable
       shell: |
         echo "AWS_ACCESS_KEY_ID {{ AWS_ACCESS_KEY_ID }}"
-    #     "aws configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }}"
-    # - name: Set the aws_secret_access_key
-    #   shell: "aws configure set aws_secret_access_key {{ AWS_SECRET_ACCESS_KEY }}"
-    # - name: Set the aws_session_token
-    #   shell: "aws configure set aws_secret_access_key {{ AWS_SESSION_TOKEN }}"
-    # - name: Set the default.region
-    #   shell: "aws configure set default.region {{ AWS_DEFAULT_REGION }}"
+        echo "AWS_SECRET_ACCESS_KEY {{ AWS_SECRET_ACCESS_KEY }}"
+        echo "AWS_SESSION_TOKEN {{ AWS_SESSION_TOKEN }}"
+        echo "AWS_DEFAULT_REGION {{ AWS_DEFAULT_REGION }}"
 
-# - name: "Fetch kubectl config"
-#   hosts: management
-#   user: ubuntu
-#   gather_facts: false
-#   become: yes
-#   vars:
-#     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-#     ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
-#   pre_tasks:
-#     - name: Create a kubeconfig file for the cluster
-#       shell: "aws eks update-kubeconfig --region {{ AWS_DEFAULT_REGION }} --name {{ ENVIRONMENT_NAME }}-cluster"
+    - name: Set the aws_access_key_id
+      shell: "aws configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }}"
+    - name: Set the aws_secret_access_key
+      shell: "aws configure set aws_secret_access_key {{ AWS_SECRET_ACCESS_KEY }}"
+    - name: Set the aws_session_token
+      shell: "aws configure set aws_secret_access_key {{ AWS_SESSION_TOKEN }}"
+    - name: Set the default.region
+      shell: "aws configure set default.region {{ AWS_DEFAULT_REGION }}"
+
+- name: "Fetch kubectl config"
+  hosts: management
+  user: ubuntu
+  gather_facts: false
+  become: yes
+  vars:
+    AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+    ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
+  pre_tasks:
+    - name: Create a kubeconfig file for the cluster
+      shell: "aws eks update-kubeconfig --region {{ AWS_DEFAULT_REGION }} --name {{ ENVIRONMENT_NAME }}-cluster"
