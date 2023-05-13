@@ -159,7 +159,7 @@ jobs:
                 cd ansible
                 ansible-playbook -i ~/inventory.txt configure-server.yml
               fi
-${checkDeployed}              
+              
       - run:
           name: Destroy environments
           when: on_fail

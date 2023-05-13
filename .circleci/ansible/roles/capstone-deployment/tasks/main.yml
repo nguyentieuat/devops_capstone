@@ -1,9 +1,0 @@
-- name: Copy deployment configuration
-  copy:
-    src: "devops-capstone-deployment.yml"
-    dest: $HOME
-
-- name: Apply deployment configuration
-  shell: "./bin/kubectl apply -f devops-capstone-deployment.yml"
-  args:
-    chdir: $HOME
