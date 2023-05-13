@@ -10,7 +10,7 @@ Parameters:
   KeyPairName:
     Description: SSH key for management 
     Type: String
-    Default: udacapstone
+    Default: udacity
     
   amiImageId:
     Description: Defines the Image-ID of the OS to deploy
