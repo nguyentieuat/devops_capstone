@@ -143,16 +143,21 @@ jobs:
             cat ~/inventory.txt
 
             echo "process config server"
+            cat ~/inventory.txt
+            cd .circleci/ansible
+            ansible-playbook -i ~/inventory.txt configure-server.yml
+              
+            
 
-            if grep -q "No changes to deploy" ~/checkDeployed.txt
-              then
-                cat ~/inventory.txt
-                echo "Our management instances are already configured."
-              else
-                cat ~/inventory.txt
-                cd .circleci/ansible
-                ansible-playbook -i ~/inventory.txt configure-server.yml
-              fi
+            # if grep -q "No changes to deploy" ~/checkDeployed.txt
+            #   then
+            #     cat ~/inventory.txt
+            #     echo "Our management instances are already configured."
+            #   else
+            #     cat ~/inventory.txt
+            #     cd .circleci/ansible
+            #     ansible-playbook -i ~/inventory.txt configure-server.yml
+            #   fi
             
   configure-cluster:
     docker:
