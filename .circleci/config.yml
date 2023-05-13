@@ -65,69 +65,69 @@ jobs:
           name: Install dependencies
           command: yum install -y tar gzip
       
-#       - run:
-#           name: Ensure EKS network exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file cloudformation/networks.yml \
-#               --tags project=${ENVIRONMENT_NAME}-project \
-#               --stack-name ${ENVIRONMENT_NAME}-eks-network \
-#               --region ${AWS_DEFAULT_REGION}
-#       - run:
-#           name: Ensure EKS Cluster exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file cloudformation/cluster.yml \
-#               --tags project=${ENVIRONMENT_NAME}-project \
-#               --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
-#               --capabilities CAPABILITY_NAMED_IAM \
-#               --region ${AWS_DEFAULT_REGION}
-#           no_output_timeout: 15m
-#       - run:
-#           name: Ensure Nodegroup exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file cloudformation/nodegroup.yml \
-#               --tags project=${ENVIRONMENT_NAME}-project \
-#               --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
-#               --capabilities CAPABILITY_NAMED_IAM \
-#               --region ${AWS_DEFAULT_REGION}
+      - run:
+          name: Ensure EKS network exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/networks.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name ${ENVIRONMENT_NAME}-eks-network \
+              --region ${AWS_DEFAULT_REGION}
+      - run:
+          name: Ensure EKS Cluster exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/cluster.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
+              --capabilities CAPABILITY_NAMED_IAM \
+              --region ${AWS_DEFAULT_REGION}
+          no_output_timeout: 15m
+      - run:
+          name: Ensure Nodegroup exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/nodegroup.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
+              --capabilities CAPABILITY_NAMED_IAM \
+              --region ${AWS_DEFAULT_REGION}
       
-#       - run:
-#           name: Ensure management instances exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file cloudformation/management.yml \
-#               --tags project=${ENVIRONMENT_NAME}-project \
-#               --stack-name "${ENVIRONMENT_NAME}-eks-management" \
-#               --region ${AWS_DEFAULT_REGION} \
-#               --output text >> ~/checkDeployed.txt
-#             cat ~/checkDeployed.txt
-#       - run:
-#           name: Extract the IPs of the management instances for Ansible
-#           command: |
-#             echo [management] > ~/inventory.txt
-#             aws ec2 describe-instances \
-#               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-#               --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
-#               --region ${AWS_DEFAULT_REGION} \
-#               --output text >> ~/inventory.txt
-#             cat ~/inventory.txt
-#       - persist_to_workspace:
-#           root: ~/
-#           paths:
-#             - inventory.txt
-#             - checkDeployed.txt
+      - run:
+          name: Ensure management instances exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/management.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-management" \
+              --region ${AWS_DEFAULT_REGION} \
+              --output text >> ~/checkDeployed.txt
+            cat ~/checkDeployed.txt
+      - run:
+          name: Extract the IPs of the management instances for Ansible
+          command: |
+            echo [management] > ~/inventory.txt
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
+              --region ${AWS_DEFAULT_REGION} \
+              --output text >> ~/inventory.txt
+            cat ~/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - inventory.txt
+            - checkDeployed.txt
 
-      # - run:
-      #     name: Destroy environments
-      #     when: on_fail
-      #     command: |
-      #       echo "Destroying environment: deploy-infrastructure "
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
-      #       aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment: deploy-infrastructure "
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
   
   configure-infrastructure:
     docker:
@@ -150,25 +150,118 @@ jobs:
             cat ~/inventory.txt
             echo "checkDeployed"
             cat ~/checkDeployed.txt
-            # if grep -q "No changes to deploy" ~/checkDeployed.txt
-            #   then
-            #     cat ~/inventory.txt
-            #     echo "Our management instances are already configured."
-            #   else
-            #     cat ~/inventory.txt
-            #     cd ansible
-            #     ansible-playbook -i ~/inventory.txt configure-server.yml
-            #   fi
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                cd ansible
+                ansible-playbook -i ~/inventory.txt configure-server.yml
+              fi
+${checkDeployed}              
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment: deploy-infrastructure "
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management              
+
+  configure-cluster:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "ae:e0:e9:2f:57:51:a2:82:ff:06:bc:9b:65:37:2a:4c"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                cd ansible
+                ansible-playbook -i ~/inventory.txt configure-cluster.yml
+              fi
+      - run:
+          name: Wait for LoadBalancer's domain to become reachable
+          command: |
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                echo "Wait 60 seconds..."
+                sleep 60
+              fi
+      - run:
+          name: Display the LoadBalancer's DNS name
+          command: |
+            cat ~/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/inventory.txt save-elb-dns.yml
+            cat ~/elb_dns.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - elb_dns.txt
+
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            echo "Destroying environment: deploy-infrastructure "
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-network
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-cluster
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-nodegroup
+            aws cloudformation delete-stack --stack-name ${ENVIRONMENT_NAME}-eks-management
+
+  deploy-docker:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "ae:e0:e9:2f:57:51:a2:82:ff:06:bc:9b:65:37:2a:4c"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Deploy newest Docker Image
+          command: |
+            cat ~/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/inventory.txt deploy-app.yml
+          no_output_timeout: 2m  
+
 workflows:
   default:
     jobs:
-      # - test-build
-      # - upload-docker:
-      #     requires:
-      #       - test-build
-      #     filters:
-      #       branches:
-      #         only: [ master ]
+      - test-build
+      - upload-docker:
+          requires:
+            - test-build
+          filters:
+            branches:
+              only: [ master ]
       - deploy-infrastructure:
           filters:
             branches:
@@ -176,3 +269,10 @@ workflows:
       - configure-infrastructure:
           requires:
             - deploy-infrastructure
+      - configure-cluster:
+          requires:
+            - configure-infrastructure
+            - upload-docker
+      - deploy-docker:
+          requires:
+            - configure-cluster
