@@ -6,7 +6,6 @@
     dest: /etc/profile.d/
 
 - name: "Authenticate AWS CLI with AWS"
-  hosts: management
   user: ubuntu
   gather_facts: false
   become: yes
@@ -26,7 +25,6 @@
       shell: "aws --profile default configure set region {{ AWS_DEFAULT_REGION }}"
 
 - name: "Fetch kubectl config"
-  hosts: management
   user: ubuntu
   gather_facts: false
   become: yes
