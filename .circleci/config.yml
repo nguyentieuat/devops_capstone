@@ -156,7 +156,7 @@ jobs:
                 echo "Our management instances are already configured."
               else
                 cat ~/inventory.txt
-                cd ansible
+                cd .circleci/ansible
                 ansible-playbook -i ~/inventory.txt configure-server.yml
               fi
             
@@ -183,7 +183,7 @@ jobs:
                 echo "Our management instances are already configured."
               else
                 cat ~/inventory.txt
-                cd ansible
+                cd .circleci/ansible
                 ansible-playbook -i ~/inventory.txt configure-cluster.yml
               fi
       - run:
@@ -202,7 +202,7 @@ jobs:
           name: Display the LoadBalancer's DNS name
           command: |
             cat ~/inventory.txt
-            cd ansible
+            cd .circleci/ansible
             ansible-playbook -i ~/inventory.txt save-elb-dns.yml
             cat ~/elb_dns.txt
       - persist_to_workspace:
@@ -228,7 +228,7 @@ jobs:
           name: Deploy newest Docker Image
           command: |
             cat ~/inventory.txt
-            cd ansible
+            cd .circleci/ansible
             ansible-playbook -i ~/inventory.txt deploy-app.yml
           no_output_timeout: 2m  
 
