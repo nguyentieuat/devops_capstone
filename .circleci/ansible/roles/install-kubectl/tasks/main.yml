@@ -1,25 +1,9 @@
 ---
 - name: "Download kubectl"
-  shell: |
-    curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl
-  args:
-    chdir: $HOME
-
-- name: "erify the downloaded binary with the SHA-256 checksum for binary"
-  shell: |
-    curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl.sha256
-  args:
-    chdir: $HOME
-
-- name: "Check the SHA-256 checksum for downloaded binary"
-  shell: |
-    sha256sum -c kubectl.sha256
-  args:
-    chdir: $HOME
-
-- name: "Download kubectl"
-  shell: |
-    openssl sha1 -sha256 kubectl
+  # shell: |
+  #   curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl
+  get_url:
+    url: https://s3.us-west-2.amazonaws.com/amazon-eks/1.26.2/2023-03-17/bin/linux/amd64/kubectl
   args:
     chdir: $HOME
 
