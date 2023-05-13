@@ -11,7 +11,7 @@
     - name: Get the LoadBalancer's DNS name
       shell: |
       echo "./bin/kubectl get pods --all-namespaces"
-      kubectl get pods --all-namespaces
+      ./bin/kubectl get pods --all-namespaces
       echo "./bin/kubectl get services -A"
       ./bin/kubectl get services -A
       echo "./bin/kubectl get svc"

@@ -13,3 +13,8 @@
   shell: ./aws/install
   args:
     chdir: $HOME
+
+- name: "Check install the AWS CLI"
+  shell: |
+    which aws
+    aws --version
