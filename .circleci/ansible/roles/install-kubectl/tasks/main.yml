@@ -35,7 +35,7 @@
 
 - name: "Grant permission the Docker"
   shell: |
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker $USER && newgrp docker
 
 - name: "Download and Install kubectl"
   shell: |
@@ -70,3 +70,6 @@
   shell: |
     minikube start
 
+- name: "Check status the minikube"
+  shell: |
+    minikube status
