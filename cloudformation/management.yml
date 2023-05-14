@@ -32,7 +32,7 @@ Resources:
   managementHost1:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro
+      InstanceType: t2.medium
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
@@ -46,7 +46,7 @@ Resources:
   managementHost2:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro
+      InstanceType: t2.medium
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName

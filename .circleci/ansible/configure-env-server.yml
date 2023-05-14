@@ -39,6 +39,8 @@
   roles:
     - configure-env-server
     - install-awscli
+    - install-docker
+    - install-minikube
     - install-kubectl
 
 - name: "Authenticate AWS CLI with AWS"
