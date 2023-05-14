@@ -238,55 +238,54 @@ jobs:
                 ansible-playbook -i ~/inventory.txt configure-server.yml
               fi
             
-  # configure-cluster:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints:
-  #           - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update ansible
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           if grep -q "No changes to deploy" ~/checkDeployed.txt
-  #             then
-  #               cat ~/inventory.txt
-  #               echo "Our management instances are already configured."
-  #             else
-  #               cat ~/inventory.txt
-  #               cd .circleci/ansible
-  #               ansible-playbook -i ~/inventory.txt configure-cluster.yml
-  #             fi
-  #     - run:
-  #         name: Wait for LoadBalancer's domain to become reachable
-  #         command: |
-  #           if grep -q "No changes to deploy" ~/checkDeployed.txt
-  #             then
-  #               cat ~/inventory.txt
-  #               echo "Our management instances are already configured."
-  #             else
-  #               cat ~/inventory.txt
-  #               echo "Wait 60 seconds..."
-  #               sleep 60
-  #             fi
-  #     - run:
-  #         name: Display the LoadBalancer's DNS name
-  #         command: |
-  #           cat ~/inventory.txt
-  #           cd .circleci/ansible
-  #           ansible-playbook -i ~/inventory.txt save-elb-dns.yml
-  #           cat ~/elb_dns.txt
-  #     - persist_to_workspace:
-  #         root: ~/
-  #         paths:
-  #           - elb_dns.txt
+  configure-cluster:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
+      - attach_workspace:
+          at: ~/
+      # Install dependencies
+      - install_ansible    
+      - install_awscli
+      - run:
+          name: Configure server
+          command: |
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                cd .circleci/ansible
+                ansible-playbook -i ~/inventory.txt configure-cluster.yml
+              fi
+      - run:
+          name: Wait for LoadBalancer's domain to become reachable
+          command: |
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                echo "Wait 60 seconds..."
+                sleep 60
+              fi
+      - run:
+          name: Display the LoadBalancer's DNS name
+          command: |
+            cat ~/inventory.txt
+            cd .circleci/ansible
+            ansible-playbook -i ~/inventory.txt save-elb-dns.yml
+            cat ~/elb_dns.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - elb_dns.txt
 
   # deploy-docker:
   #   docker:
@@ -327,10 +326,10 @@ workflows:
       - configure-infrastructure:
           requires:
             - deploy-infrastructure
-      # - configure-cluster:
-      #     requires:
-      #       - configure-infrastructure
-      #       - upload-docker
+      - configure-cluster:
+          requires:
+            - configure-infrastructure
+            - upload-docker
       # - deploy-docker:
       #     requires:
       #       - configure-cluster

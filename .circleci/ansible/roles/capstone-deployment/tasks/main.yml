@@ -4,6 +4,6 @@
     dest: $HOME
 
 - name: Apply deployment configuration
-  shell: "./bin/kubectl apply -f devops-capstone-deployment.yml"
+  shell: "kubectl apply -f devops-capstone-deployment.yml"
   args:
     chdir: $HOME

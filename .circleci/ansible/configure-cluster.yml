@@ -4,6 +4,10 @@
   user: ubuntu
   gather_facts: false
   become: yes
+  pre_tasks:
+    - name: "Set environment variables"
+      shell: |
+        export ENVIRONMENT_NAME=Luannt19-Uda
   vars:
     ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
   roles:

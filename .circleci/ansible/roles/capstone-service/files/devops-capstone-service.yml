@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: devops-capstone-service
+  name: Luannt19-Uda-service
 spec:
   type: LoadBalancer
   selector:
-    app: devops-capstone
+    app: Luannt19-Uda-app
   ports:
     - protocol: TCP
       port: 5000

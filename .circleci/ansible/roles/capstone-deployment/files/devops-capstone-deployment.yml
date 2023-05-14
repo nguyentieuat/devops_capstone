@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devops-capstone-deployment
+  name: Luannt19-Uda-deployment
   labels:
-    app: devops-capstone
+    app: Luannt19-Uda-app
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: devops-capstone
+      app: Luannt19-Uda-app
   template:
     metadata:
       labels:
-        app: devops-capstone
+        app: Luannt19-Uda-app
     spec:
       containers:
-        - name: devops-capstone
+        - name: Luannt19-Uda-app
           image: luannt19/devops-capstone
           ports:
             - containerPort: 5000
