@@ -151,6 +151,38 @@ jobs:
                 ansible-playbook -i ~/inventory.txt configure-env-server.yml
               fi
 
+  start-minikube-server:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            # echo "process config server"
+            # cat ~/inventory.txt
+            # cd .circleci/ansible
+            # ansible-playbook -i ~/inventory.txt configure-env-server.yml
+              
+            if grep -q "No changes to deploy" ~/checkDeployed.txt
+              then
+                cat ~/inventory.txt
+                echo "Our management instances are already configured."
+              else
+                cat ~/inventory.txt
+                cd .circleci/ansible
+                ansible-playbook -i ~/inventory.txt start-minikube-server.yml
+              fi
+
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11

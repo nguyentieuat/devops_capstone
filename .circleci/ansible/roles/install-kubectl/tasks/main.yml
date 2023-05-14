@@ -61,16 +61,6 @@
   shell: |
     which minikube
     minikube version
-
-# move file grant .sh and excute
-- name: Transfer the script
-  copy: src=grant-docker.sh dest=/usr/local/ mode=0777
-- name: Execute the script
-  command: sh /usr/local/grant-docker.sh
-
-- name: "Start the minikube"
-  shell: |
-    minikube start
     
 - name: "Check status the minikube"
   shell: |
