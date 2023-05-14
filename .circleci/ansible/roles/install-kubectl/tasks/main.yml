@@ -33,11 +33,6 @@
   shell: |
     sudo systemctl status docker
 
-- name: "Grant permission the Docker"
-  shell: |
-    # sudo usermod -aG docker $USER && newgrp docker
-    sudo chmod 660 /var/run/docker.sock
-
 - name: "Download and Install kubectl"
   shell: |
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -73,4 +68,5 @@
 
 - name: "Check status the minikube"
   shell: |
+    sudo usermod -aG docker $USER && newgrp docker
     minikube status
