@@ -304,12 +304,14 @@ workflows:
       - configure-env-server:
           requires:
             - deploy-infrastructure
+      - start-minikube-server:
+            requires:
+            - configure-env-server
       - configure-infrastructure:
           requires:
-            - configure-env-server      
+            - start-minikube-server     
       - configure-cluster:
           requires:
-            - configure-env-server      
             - configure-infrastructure
             - upload-docker
       - deploy-docker:
