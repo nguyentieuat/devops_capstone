@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: Luannt19-Uda-deployment
+  name: luannt19-uda-deployment
   labels:
-    app: Luannt19-Uda-app
+    app: luannt19-uda-app
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: Luannt19-Uda-app
+      app: luannt19-uda-app
   template:
     metadata:
       labels:
-        app: Luannt19-Uda-app
+        app: luannt19-uda-app
     spec:
       containers:
-        - name: Luannt19-Uda-app
+        - name: luannt19-uda-app
           image: luannt19/devops-capstone
           ports:
             - containerPort: 5000

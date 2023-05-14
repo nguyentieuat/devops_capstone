@@ -7,7 +7,7 @@
   pre_tasks:
     - name: "Set environment variables"
       shell: |
-        export ENVIRONMENT_NAME=Luannt19-Uda
+        export ENVIRONMENT_NAME=luannt19-uda
   vars:
     ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
   roles:

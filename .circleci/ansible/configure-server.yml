@@ -41,7 +41,7 @@
         export AWS_SECRET_ACCESS_KEY=5mZ7Hja6MxT9b1lFrWxDH41A2+OAal+dBFI1W9YF
         export AWS_DEFAULT_REGION=us-east-1
         export AWS_SESSION_TOKEN=FwoGZXIvYXdzEOX//////////wEaDDLmh3KyYnQP330bBSLVAW8hBZkIRN8g4WvyFnkNZzjc6J1wVykgEf00oPWeStniHVDsc0nvJdOkdTntAMnJael+0qswXRYu/rEeUDTdZmlFDjTdL7zi1HlVfZ/tPCA97AShVK1PEkbRBznT8QJ1f1x/BjlssSl5Qjp+zIKexe7aRILmWTArhXKoKrLGTUDl7SFo3Zdqp/biAagW8c3aIS10iH7zjzy8BZmuVZobiSmCCLDwC3FvXeHyoCK1ItKdojsl74ZL0WHEKpBssWdZ/7fZJr7GqfEQODSlokSwLx+w9LvTdSj1koOjBjItlxxvCuIE6P1Id+MIhv/dRLKmAxTdQtCOntPBSZxxTsmfDqbzaPUxJrGwPRNK
-        export ENVIRONMENT_NAME=Luannt19-Uda
+        export ENVIRONMENT_NAME=luannt19-uda
   
   roles:
     - install-awscli

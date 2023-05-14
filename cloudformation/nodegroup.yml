@@ -4,7 +4,7 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
-    Default: Luannt19-Uda
+    Default: luannt19-uda
 
   MinSize:
     Description: Minimum number of web application server
