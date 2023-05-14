@@ -1,3 +1,38 @@
+- name: "Install dependencies docker"
+  shell: |
+    # sudo rm /var/lib/apt/lists/lock
+    # sudo rm /var/cache/apt/archives/lock
+    # sudo rm /var/lib/dpkg/lock*
+    # sudo dpkg --configure -a
+    sudo apt-get update -y
+    sudo apt install apt-transport-https ca-certificates software-properties-common -y
+  args:
+    chdir: $HOME
+
+- name: "Docker certificates"
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  args:
+    chdir: $HOME
+
+- name: "Download docker"
+  shell: |
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  args:
+    chdir: $HOME
+
+- name: "Install docker"
+  shell: |
+    sudo apt update -y
+    apt-cache policy docker-ce
+    sudo apt install docker-ce -y
+  args:
+    chdir: $HOME
+
+- name: "Check install the Docker"
+  shell: |
+    sudo systemctl status docker
+
 - name: "Download and Install kubectl"
   shell: |
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -14,3 +49,20 @@
   shell: |
     which kubectl
     kubectl version --short --client
+
+- name: "Install the minikube"
+  shell: |
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    sudo install minikube-linux-amd64
+  args:
+    chdir: $HOME
+
+- name: "Check install the minikube"
+  shell: |
+    which minikube
+    minikube version
+
+- name: "Start the minikube"
+  shell: |
+    minikube start
+
