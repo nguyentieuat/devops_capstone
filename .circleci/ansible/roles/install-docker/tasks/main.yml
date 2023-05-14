@@ -3,17 +3,14 @@
     sudo rm /var/lib/apt/lists/lock
     sudo rm /var/cache/apt/archives/lock
     sudo rm /var/lib/dpkg/lock*
-
     sudo dpkg --configure -a
     sudo apt-get update -y
-
     sudo apt install apt-transport-https ca-certificates software-properties-common -y
   args:
     chdir: $HOME
 
 - name: "Docker certificates"
   shell: |
-    
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   args:
     chdir: $HOME
