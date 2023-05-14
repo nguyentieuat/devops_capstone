@@ -1,5 +1,29 @@
 version: 2.1
 
+commands:
+    # Install AWS CLI
+  install_awscli:
+    description: Install AWS cli
+    steps:
+      - run:
+          name: Install AWS cli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  # Install Ansible
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+
 jobs:
   test-build:
     docker:
@@ -185,7 +209,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
       - add_ssh_keys:
@@ -193,10 +217,9 @@ jobs:
             - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
       - attach_workspace:
           at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
+      # Install dependencies
+      - install_ansible    
+      - install_awscli
       - run:
           name: Configure server
           command: |
@@ -215,77 +238,77 @@ jobs:
                 ansible-playbook -i ~/inventory.txt configure-server.yml
               fi
             
-  configure-cluster:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
-      - run:
-          name: Configure server
-          command: |
-            if grep -q "No changes to deploy" ~/checkDeployed.txt
-              then
-                cat ~/inventory.txt
-                echo "Our management instances are already configured."
-              else
-                cat ~/inventory.txt
-                cd .circleci/ansible
-                ansible-playbook -i ~/inventory.txt configure-cluster.yml
-              fi
-      - run:
-          name: Wait for LoadBalancer's domain to become reachable
-          command: |
-            if grep -q "No changes to deploy" ~/checkDeployed.txt
-              then
-                cat ~/inventory.txt
-                echo "Our management instances are already configured."
-              else
-                cat ~/inventory.txt
-                echo "Wait 60 seconds..."
-                sleep 60
-              fi
-      - run:
-          name: Display the LoadBalancer's DNS name
-          command: |
-            cat ~/inventory.txt
-            cd .circleci/ansible
-            ansible-playbook -i ~/inventory.txt save-elb-dns.yml
-            cat ~/elb_dns.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - elb_dns.txt
+  # configure-cluster:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apk add --update ansible
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           if grep -q "No changes to deploy" ~/checkDeployed.txt
+  #             then
+  #               cat ~/inventory.txt
+  #               echo "Our management instances are already configured."
+  #             else
+  #               cat ~/inventory.txt
+  #               cd .circleci/ansible
+  #               ansible-playbook -i ~/inventory.txt configure-cluster.yml
+  #             fi
+  #     - run:
+  #         name: Wait for LoadBalancer's domain to become reachable
+  #         command: |
+  #           if grep -q "No changes to deploy" ~/checkDeployed.txt
+  #             then
+  #               cat ~/inventory.txt
+  #               echo "Our management instances are already configured."
+  #             else
+  #               cat ~/inventory.txt
+  #               echo "Wait 60 seconds..."
+  #               sleep 60
+  #             fi
+  #     - run:
+  #         name: Display the LoadBalancer's DNS name
+  #         command: |
+  #           cat ~/inventory.txt
+  #           cd .circleci/ansible
+  #           ansible-playbook -i ~/inventory.txt save-elb-dns.yml
+  #           cat ~/elb_dns.txt
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - elb_dns.txt
 
-  deploy-docker:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
-      - run:
-          name: Deploy newest Docker Image
-          command: |
-            cat ~/inventory.txt
-            cd .circleci/ansible
-            ansible-playbook -i ~/inventory.txt deploy-app.yml
-          no_output_timeout: 2m  
+  # deploy-docker:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apk add --update ansible
+  #     - run:
+  #         name: Deploy newest Docker Image
+  #         command: |
+  #           cat ~/inventory.txt
+  #           cd .circleci/ansible
+  #           ansible-playbook -i ~/inventory.txt deploy-app.yml
+  #         no_output_timeout: 2m  
 
 workflows:
   default:
@@ -304,10 +327,10 @@ workflows:
       - configure-infrastructure:
           requires:
             - deploy-infrastructure
-      - configure-cluster:
-          requires:
-            - configure-infrastructure
-            - upload-docker
-      - deploy-docker:
-          requires:
-            - configure-cluster
+      # - configure-cluster:
+      #     requires:
+      #       - configure-infrastructure
+      #       - upload-docker
+      # - deploy-docker:
+      #     requires:
+      #       - configure-cluster
