@@ -62,6 +62,3 @@
     which minikube
     minikube version
     
-- name: "Check status the minikube"
-  shell: |
-    minikube status
