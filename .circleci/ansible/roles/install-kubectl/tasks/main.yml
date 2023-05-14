@@ -61,15 +61,15 @@
   shell: |
     which minikube
     minikube version
-
-- name: "Start the minikube"
-  shell: |
-    minikube start
-
+    
 - name: "Grant permission the Docker"
   shell: |
     sudo groupadd docker
     sudo usermod -aG docker $USER
+
+- name: "Start the minikube"
+  shell: |
+    minikube start --driver=docker
     
 - name: "Check status the minikube"
   shell: |
