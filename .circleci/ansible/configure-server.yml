@@ -36,12 +36,12 @@
         state: latest
         update_cache: yes
     - name: "Set environment variables"
-        shell: |
-          export AWS_ACCESS_KEY_ID: ASIAUZYACTHF2P3CUMVG
-          export AWS_SECRET_ACCESS_KEY: 5mZ7Hja6MxT9b1lFrWxDH41A2+OAal+dBFI1W9YF
-          export AWS_DEFAULT_REGION: us-east-1
-          export AWS_SESSION_TOKEN: FwoGZXIvYXdzEOX//////////wEaDDLmh3KyYnQP330bBSLVAW8hBZkIRN8g4WvyFnkNZzjc6J1wVykgEf00oPWeStniHVDsc0nvJdOkdTntAMnJael+0qswXRYu/rEeUDTdZmlFDjTdL7zi1HlVfZ/tPCA97AShVK1PEkbRBznT8QJ1f1x/BjlssSl5Qjp+zIKexe7aRILmWTArhXKoKrLGTUDl7SFo3Zdqp/biAagW8c3aIS10iH7zjzy8BZmuVZobiSmCCLDwC3FvXeHyoCK1ItKdojsl74ZL0WHEKpBssWdZ/7fZJr7GqfEQODSlokSwLx+w9LvTdSj1koOjBjItlxxvCuIE6P1Id+MIhv/dRLKmAxTdQtCOntPBSZxxTsmfDqbzaPUxJrGwPRNK
-          export ENVIRONMENT_NAME: Luannt19-Uda
+      shell: |
+        export AWS_ACCESS_KEY_ID: ASIAUZYACTHF2P3CUMVG
+        export AWS_SECRET_ACCESS_KEY: 5mZ7Hja6MxT9b1lFrWxDH41A2+OAal+dBFI1W9YF
+        export AWS_DEFAULT_REGION: us-east-1
+        export AWS_SESSION_TOKEN: FwoGZXIvYXdzEOX//////////wEaDDLmh3KyYnQP330bBSLVAW8hBZkIRN8g4WvyFnkNZzjc6J1wVykgEf00oPWeStniHVDsc0nvJdOkdTntAMnJael+0qswXRYu/rEeUDTdZmlFDjTdL7zi1HlVfZ/tPCA97AShVK1PEkbRBznT8QJ1f1x/BjlssSl5Qjp+zIKexe7aRILmWTArhXKoKrLGTUDl7SFo3Zdqp/biAagW8c3aIS10iH7zjzy8BZmuVZobiSmCCLDwC3FvXeHyoCK1ItKdojsl74ZL0WHEKpBssWdZ/7fZJr7GqfEQODSlokSwLx+w9LvTdSj1koOjBjItlxxvCuIE6P1Id+MIhv/dRLKmAxTdQtCOntPBSZxxTsmfDqbzaPUxJrGwPRNK
+        export ENVIRONMENT_NAME: Luannt19-Uda
   
   roles:
     - install-awscli
@@ -53,10 +53,14 @@
   gather_facts: false
   become: yes
   vars:
-    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-    AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
-    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    # AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+    # AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+    # AWS_SESSION_TOKEN: $AWS_SESSION_TOKEN
+    # AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    AWS_SESSION_TOKEN: "{{ lookup('env', 'AWS_SESSION_TOKEN') }}"
+    AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
   tasks:
     - name: Set the aws_access_key_id
       shell: "aws configure set aws_access_key_id {{ AWS_ACCESS_KEY_ID }}"
@@ -73,6 +77,8 @@
   gather_facts: false
   become: yes
   vars:
+    # AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    # ENVIRONMENT_NAME: $ENVIRONMENT_NAME
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
     ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
   pre_tasks:
