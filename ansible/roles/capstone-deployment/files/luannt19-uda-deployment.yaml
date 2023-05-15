@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: luannt19-uda-app
-          image: luannt19/devops-capstone
+          image: nguyentieuat/devops-capstone
           ports:
             - containerPort: 5000
