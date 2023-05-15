@@ -10,7 +10,7 @@
     DOCKER_IMAGE_NAME: "{{ lookup('env', 'DOCKER_IMAGE_NAME') }}"
   tasks:
     - name: Update the deployment to run the latest Build
-      shell: "./bin/kubectl set image deployments/{{ ENVIRONMENT_NAME }}-deployment {{ ENVIRONMENT_NAME }}-app={{ DOCKERHUB_USERNAME }}/{{ ENVIRONMENT_NAME }}:{{ CIRCLE_WORKFLOW_ID }}"
+      shell: "./bin/kubectl set image deployments/{{ ENVIRONMENT_NAME }}-deployment {{ ENVIRONMENT_NAME }}-app={{ DOCKERHUB_USERNAME }}/{{ DOCKER_IMAGE_NAME }}:{{ CIRCLE_WORKFLOW_ID }}"
       args:
         chdir: $HOME
 
