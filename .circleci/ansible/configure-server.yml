@@ -37,10 +37,10 @@
         update_cache: yes
     - name: "Set environment variables"
       shell: |
-        export AWS_ACCESS_KEY_ID=ASIAUZYACTHF2P3CUMVG
-        export AWS_SECRET_ACCESS_KEY=5mZ7Hja6MxT9b1lFrWxDH41A2+OAal+dBFI1W9YF
+        export AWS_ACCESS_KEY_ID=ASIAUZYACTHFYYX6AYWK
+        export AWS_SECRET_ACCESS_KEY=rKI2VnCBJX88yekCUiyyT6eyoorjjJfdw6qUYsj3
         export AWS_DEFAULT_REGION=us-east-1
-        export AWS_SESSION_TOKEN=FwoGZXIvYXdzEOX//////////wEaDDLmh3KyYnQP330bBSLVAW8hBZkIRN8g4WvyFnkNZzjc6J1wVykgEf00oPWeStniHVDsc0nvJdOkdTntAMnJael+0qswXRYu/rEeUDTdZmlFDjTdL7zi1HlVfZ/tPCA97AShVK1PEkbRBznT8QJ1f1x/BjlssSl5Qjp+zIKexe7aRILmWTArhXKoKrLGTUDl7SFo3Zdqp/biAagW8c3aIS10iH7zjzy8BZmuVZobiSmCCLDwC3FvXeHyoCK1ItKdojsl74ZL0WHEKpBssWdZ/7fZJr7GqfEQODSlokSwLx+w9LvTdSj1koOjBjItlxxvCuIE6P1Id+MIhv/dRLKmAxTdQtCOntPBSZxxTsmfDqbzaPUxJrGwPRNK
+        export AWS_SESSION_TOKEN=FwoGZXIvYXdzEPr//////////wEaDBQqtDCAc+Vsx8nN0SLVAQI7F1eNZMZzoJSI4ckIiTKkTAkF0x8SQ3GVi3VHs+cPzsk3FkW8iP+D0KxSflHXHbJ/rh/qRQUkDj7g+brDcPlxY7GNLdz0YA18soUOMUGTdmbUF55HcXkJ3nnqRRmRNC7rCISEMv2fUiKPkx3wm30NinBtrLqQcrO6BQYchTUW43QnnilU9vMdF75px8XTI06NxIGARyftgWrKZRndHTjCgf2MeBA643rNfbXFmEg7MgUxPx7uEz03RWGbr8ywrXlMiB6MoiD3h/vByrTHsNPehhVP+Sjc1IejBjItkZGZLxyTHtWA1PcMQunzEclWa/77yVSPpP4pSM414gU/v4mZtyZ8LliQkseq
         export ENVIRONMENT_NAME=luannt19-uda
   
   roles:
