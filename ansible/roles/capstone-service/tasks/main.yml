@@ -1,9 +1,9 @@
 - name: Copy service configuration
   copy:
-    src: "devops-capstone-service.yml"
+    src: "{{ ENVIRONMENT_NAME }}-service.yaml"
     dest: $HOME
 
 - name: Create service configuration
-  command: "kubectl apply -f devops-capstone-service.yml"
+  command: "./bin/kubectl apply -f {{ ENVIRONMENT_NAME }}-service.yaml"
   args:
     chdir: $HOME

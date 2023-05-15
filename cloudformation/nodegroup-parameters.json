@@ -1,0 +1,7 @@
+[
+  "EnvironmentName=luannt19-uda",
+  "MinSize=2",
+  "MaxSize=6",
+  "DesiredSize=4",
+  "KeyPairName=udacity"
+]

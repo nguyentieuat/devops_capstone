@@ -1,28 +1,28 @@
 version: 2.1
 
 commands:
-    # Install AWS CLI
-  install_awscli:
-    description: Install AWS cli
-    steps:
-      - run:
-          name: Install AWS cli
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+  #   # Install AWS CLI
+  # install_awscli:
+  #   description: Install AWS cli
+  #   steps:
+  #     - run:
+  #         name: Install AWS cli
+  #         command: |
+  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  #           unzip awscliv2.zip
+  #           sudo ./aws/install
 
-  # Install Ansible
-  install_ansible:
-    description: Install Ansible
-    steps:
-      - run:
-          name: Install Ansible
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common -y
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
+  # # Install Ansible
+  # install_ansible:
+  #   description: Install Ansible
+  #   steps:
+  #     - run:
+  #         name: Install Ansible
+  #         command: |
+  #           sudo apt update
+  #           sudo apt install software-properties-common -y
+  #           sudo add-apt-repository --yes --update ppa:ansible/ansible
+  #           sudo apt install ansible -y
 
 jobs:
   test-build:
@@ -76,8 +76,8 @@ jobs:
           command: |
             echo "Docker ID and Image: $DOCKER_IMAGE_NAME"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
-            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID:0:7}
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID}
+            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:${CIRCLE_WORKFLOW_ID}
   
   deploy-infrastructure:
     description: Deploy Infrastructure EKS
@@ -96,6 +96,7 @@ jobs:
               --template-file cloudformation/networks.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
               --stack-name ${ENVIRONMENT_NAME}-eks-network \
+              --parameter-overrides file://cloudformation/network-parameters.json \
               --region ${AWS_DEFAULT_REGION}
       - run:
           name: Ensure EKS Cluster exists
@@ -104,6 +105,7 @@ jobs:
               --template-file cloudformation/cluster.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
               --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
+              --parameter-overrides file://cloudformation/cluster-parameters.json \
               --capabilities CAPABILITY_NAMED_IAM \
               --region ${AWS_DEFAULT_REGION}
           no_output_timeout: 15m
@@ -114,6 +116,7 @@ jobs:
               --template-file cloudformation/nodegroup.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
               --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
+              --parameter-overrides file://cloudformation/nodegroup-parameters.json \
               --capabilities CAPABILITY_NAMED_IAM \
               --region ${AWS_DEFAULT_REGION}
       
@@ -124,6 +127,7 @@ jobs:
               --template-file cloudformation/management.yml \
               --tags project=${ENVIRONMENT_NAME}-project \
               --stack-name "${ENVIRONMENT_NAME}-eks-management" \
+              --parameter-overrides file://cloudformation/management-parameters.json \
               --region ${AWS_DEFAULT_REGION} \
               --output text >> ~/checkDeployed.txt
             cat ~/checkDeployed.txt
@@ -145,7 +149,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - add_ssh_keys:
@@ -153,30 +157,26 @@ jobs:
             - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
       - attach_workspace:
           at: ~/
-      # Install dependencies
-      - install_ansible    
-      - install_awscli
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
       - run:
           name: Configure server
           command: |
-            # echo "process config server"
-            # cat ~/inventory.txt
-            # cd .circleci/ansible
-            # ansible-playbook -i ~/inventory.txt configure-server.yml
-              
             if grep -q "No changes to deploy" ~/checkDeployed.txt
               then
                 cat ~/inventory.txt
                 echo "Our management instances are already configured."
               else
-                cat ~/inventory.txt
-                cd .circleci/ansible
-                ansible-playbook -i ~/inventory.txt configure-server.yml
               fi
+            cat ~/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/inventory.txt configure-server.yml
             
   configure-cluster:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - add_ssh_keys:
@@ -184,21 +184,23 @@ jobs:
             - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
       - attach_workspace:
           at: ~/
-      # Install dependencies
-      - install_ansible    
-      - install_awscli
       - run:
-          name: Configure server
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Configure cluster
           command: |
             if grep -q "No changes to deploy" ~/checkDeployed.txt
               then
                 cat ~/inventory.txt
                 echo "Our management instances are already configured."
               else
-                cat ~/inventory.txt
-                cd .circleci/ansible
-                ansible-playbook -i ~/inventory.txt configure-cluster.yml
               fi
+            cat ~/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/inventory.txt configure-cluster.yml
+
       - run:
           name: Wait for LoadBalancer's domain to become reachable
           command: |
@@ -215,7 +217,7 @@ jobs:
           name: Display the LoadBalancer's DNS name
           command: |
             cat ~/inventory.txt
-            cd .circleci/ansible
+            cd ansible
             ansible-playbook -i ~/inventory.txt save-elb-dns.yml
             cat ~/elb_dns.txt
       - persist_to_workspace:
@@ -223,27 +225,27 @@ jobs:
           paths:
             - elb_dns.txt
 
-  # deploy-docker:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints:
-  #           - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update ansible
-  #     - run:
-  #         name: Deploy newest Docker Image
-  #         command: |
-  #           cat ~/inventory.txt
-  #           cd .circleci/ansible
-  #           ansible-playbook -i ~/inventory.txt deploy-app.yml
-  #         no_output_timeout: 2m  
+  deploy-docker:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "6f:d8:99:93:0b:e9:44:47:eb:49:45:4c:b3:c6:5a:37"
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+      - run:
+          name: Deploy newest Docker Image
+          command: |
+            cat ~/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/inventory.txt deploy-app.yml
+          no_output_timeout: 2m  
 
 workflows:
   default:
@@ -266,6 +268,6 @@ workflows:
           requires:
             - configure-infrastructure
             - upload-docker
-      # - deploy-docker:
-      #     requires:
-      #       - configure-cluster
+      - deploy-docker:
+          requires:
+            - configure-cluster

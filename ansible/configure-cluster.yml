@@ -4,12 +4,9 @@
   user: ubuntu
   gather_facts: false
   become: yes
-  pre_tasks:
-    - name: "Set environment variables"
-      shell: |
-        export ENVIRONMENT_NAME=luannt19-uda
   vars:
     ENVIRONMENT_NAME: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
   roles:
     - capstone-deployment
     - capstone-service
+
